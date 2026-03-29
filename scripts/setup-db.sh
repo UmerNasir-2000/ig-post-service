@@ -25,16 +25,39 @@ done
 echo "Seeding database..."
 
 docker exec -i $CONTAINER_NAME psql -U ig-post-user -d ig-post-db <<EOF
-CREATE TABLE posts (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255),
-    content TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+-- Enable UUID generation
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Create posts table
+CREATE TABLE IF NOT EXISTS posts (
+    post_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    post_uuid UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+
+    fk_user_uuid UUID NOT NULL,
+
+    title VARCHAR(255) NOT NULL,
+
+    caption TEXT NOT NULL
+        CHECK (char_length(caption) <= 2200),
+
+    visibility VARCHAR(10) NOT NULL
+        CHECK (visibility IN ('PUBLIC', 'PRIVATE')),
+
+    like_count INTEGER NOT NULL DEFAULT 0,
+    comment_count INTEGER NOT NULL DEFAULT 0,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
-INSERT INTO posts (title, content) VALUES
-('First Post', 'Hello from inline SQL'),
-('Second Post', 'No files needed!');
+-- Insert sample data
+INSERT INTO posts (fk_user_uuid, title, caption, visibility)
+VALUES
+    (gen_random_uuid(), 'First Post', 'Hello from inline SQL', 'PUBLIC'),
+    (gen_random_uuid(), 'Second Post', 'No files needed!', 'PUBLIC');
+
 EOF
 
 echo "Database ready 🚀"
