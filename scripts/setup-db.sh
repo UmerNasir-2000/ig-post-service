@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
     fk_user_uuid UUID NOT NULL,
 
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(214) NOT NULL,
 
     caption TEXT NOT NULL
         CHECK (char_length(caption) <= 2200),
