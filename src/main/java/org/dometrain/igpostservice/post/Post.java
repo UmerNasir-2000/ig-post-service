@@ -20,7 +20,7 @@ import java.util.UUID;
 @Setter
 @SQLDelete(sql = "UPDATE posts SET deleted_at = CURRENT_TIMESTAMP WHERE post_id = ?")
 @SQLRestriction("deleted_at IS NULL")
-public class Post {
+public final class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,14 +44,19 @@ public class Post {
      * Denormalized column representing the total number of likes.
      */
     @Column(nullable = false, columnDefinition = "DEFAULT 0")
-    private Integer likeCount;
+    private int likeCount;
 
     /**
      * Denormalized column representing the total number of comments.
      * This value is updated asynchronously via events produced by the CommentService.
      */
     @Column(nullable = false, columnDefinition = "DEFAULT 0")
-    private Integer commentCount;
+    private int commentCount;
+
+    /**
+     * Timestamp used for soft deletion; if non-null, the post is considered deleted.
+     */
+    private LocalDateTime deletedAt;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -60,9 +65,4 @@ public class Post {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    /**
-     * Timestamp used for soft deletion; if non-null, the post is considered deleted.
-     */
-    private LocalDateTime deletedAt;
 }
