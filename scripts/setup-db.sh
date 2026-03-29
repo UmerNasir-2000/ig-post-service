@@ -12,7 +12,7 @@ docker run -d \
   -e POSTGRES_USER=ig-post-user \
   -e POSTGRES_PASSWORD=post-password \
   -e POSTGRES_DB=ig-post-db \
-  -p 5432:5432 \
+  -p 3001:5432 \
   postgres:alpine
 
 echo "Waiting for Postgres to be ready..."
